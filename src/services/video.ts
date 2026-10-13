@@ -106,19 +106,18 @@ const processVideoWithFFmpeg = (
     }
 
     ffmpeg(inputPath)
-      .fps(VIDEO_STICKER_CONFIG.fps)
       .duration(VIDEO_STICKER_CONFIG.maxDuration)
       .outputOptions([
         '-c:v libwebp_anim',
         '-pix_fmt yuva420p', // Best pixel format for cross-platform compatibility
-        `-vf ${videoFilter},fps=12`, // 12 FPS for good balance of smoothness and size
+        `-vf ${videoFilter},fps=${VIDEO_STICKER_CONFIG.fps}`, // 24 FPS for smooth animation
         '-loop 0',
         '-an', // No audio
         '-preset default',
-        '-quality 50', // Balanced quality for good visual result
+        '-quality 32', // Balanced quality with higher compression
         '-compression_level 6', // Higher compression for smaller files
         '-qmin 10', // Lower minimum quality threshold
-        '-qmax 50', // Higher maximum quality threshold
+        '-qmax 60', // Allow higher compression for complex frames
         '-method 6', // Best compression method (slower but smaller)
         '-metadata:s:v:0 alpha_mode=1', // Ensure alpha channel metadata for transparency
         '-f webp',

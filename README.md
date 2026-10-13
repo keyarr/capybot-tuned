@@ -9,7 +9,7 @@ CapyBot is a WhatsApp bot that can create stickers. It's built with TypeScript a
 ## Features
 
 - **Image Stickers**: Convert images to WhatsApp stickers
-- **Video Stickers**: Create animated stickers from videos (max 15 seconds)
+- **Video Stickers**: Create animated stickers from videos (max 6 seconds)
 - **Media Processing**: Support for various image and video formats
 - **Real-time Messaging**: Handle incoming WhatsApp messages automatically
 - **QR Code Authentication**: Easy setup with QR code scanning
@@ -149,9 +149,9 @@ capybot/
 
 The bot uses default configurations for media processing. You can modify these in `src/constants/config.ts`:
 
-- **Video Stickers**: Max 10 seconds, 50MB file size
+- **Video Stickers**: Max 6 seconds, 50MB file size
 - **Dimensions**: 512x512 pixels
-- **FPS**: 60 frames per second
+- **FPS**: 24 frames per second
 - **Quality**: Medium
 
 ### Environment Variables
