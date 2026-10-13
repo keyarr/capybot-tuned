@@ -3,7 +3,7 @@ export const HELP_MESSAGE = `🤖 *CapyBot - Ajuda*
 
 📸 *Como usar:*
 - Envie uma imagem que eu transformo em figurinha!
-- Envie um vídeo (até ${VIDEO_STICKER_CONFIG.maxDuration}s) que eu transformo em GIF animado!
+- Envie um vídeo (uso os primeiros ${VIDEO_STICKER_CONFIG.maxDuration}s) que eu transformo em GIF animado!
 
 ❓ *Comandos:*
 - /help - Esta mensagem
@@ -39,7 +39,7 @@ export const ERROR_MAX_DURATION_VIDEO_MESSAGE = `⏰ Vídeo muito longo!
 
 export const PROCESSING_VIDEO_MESSAGE = `🎬 Processando vídeo para GIF animado...\n\n⏳ Isso pode levar 30-60 segundos, aguarde!`;
 
-export const ERROR_VIDEO_MESSAGE = `😅 Ops! Erro ao processar seu vídeo.\n\n💡 *Dicas:*\n• Vídeos até ${VIDEO_STICKER_CONFIG.maxDuration} segundos\n• Formatos: MP4, MOV\n• Tamanho máximo: 50MB\n\nTente novamente! 🎯`;
+export const ERROR_VIDEO_MESSAGE = `😅 Ops! Erro ao processar seu vídeo.\n\n💡 *Dicas:*\n• Formatos: MP4, MOV\n• Tamanho máximo: 50MB\n\nTente novamente! 🎯`;
 
 export const MAINTENANCE_MESSAGE = `🔧 *CapyBot em Manutenção*
 

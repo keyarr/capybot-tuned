@@ -15,10 +15,6 @@ export const processVideoToAnimatedStickers = async (
     tempDir,
     `sticker_square_${timestamp}.webp`
   );
-  const originalOutputPath = path.resolve(
-    tempDir,
-    `sticker_original_${timestamp}.webp`
-  );
 
   try {
     console.log('🎬 Starting video processing for both formats...');
@@ -52,32 +48,23 @@ export const processVideoToAnimatedStickers = async (
       };
     }
 
-    // Process square sticker (512x512)
+    // Always return only the square (1:1) sticker
     console.log('🔲 Processing square sticker...');
     await processVideoWithFFmpeg(videoPath, squareOutputPath, 'square');
 
-    // Process original format sticker
-    console.log('📐 Processing original format sticker...');
-    await processVideoWithFFmpeg(videoPath, originalOutputPath, 'original');
-
     const squareBuffer = fs.readFileSync(squareOutputPath);
-    const originalBuffer = fs.readFileSync(originalOutputPath);
 
     // Clean temporary files
     if (fs.existsSync(squareOutputPath)) {
       fs.unlinkSync(squareOutputPath);
     }
-    if (fs.existsSync(originalOutputPath)) {
-      fs.unlinkSync(originalOutputPath);
-    }
 
     console.log(
-      `✅ Both stickers created: Square ${(squareBuffer.length / 1024).toFixed(2)} KB, Original ${(originalBuffer.length / 1024).toFixed(2)} KB`
+      `✅ Square sticker created: ${(squareBuffer.length / 1024).toFixed(2)} KB`
     );
 
     return {
       square: squareBuffer,
-      original: originalBuffer,
     };
   } catch (error: any) {
     console.error('❌ Error processing video:', error);
@@ -169,14 +156,8 @@ const validateVideoForSticker = async (
       }
 
       const duration = metadata.format.duration ?? 0;
-      if (duration > VIDEO_STICKER_CONFIG.maxDuration) {
-        reject(
-          new Error(
-            `Video too long. Maximum: ${VIDEO_STICKER_CONFIG.maxDuration}s`
-          )
-        );
-        return;
-      }
+      // Long videos are trimmed to the first maxDuration seconds by FFmpeg,
+      // so duration is not a rejection reason here.
 
       const fileSize = metadata.format.size ?? 0;
       if (fileSize > VIDEO_STICKER_CONFIG.maxFileSize) {

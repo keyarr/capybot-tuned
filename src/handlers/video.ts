@@ -9,7 +9,6 @@ import fs from 'fs';
 import path from 'path';
 import {
   ERROR_UNSUPPORTED_VIDEO_MESSAGE,
-  ERROR_MAX_DURATION_VIDEO_MESSAGE,
   PROCESSING_VIDEO_MESSAGE,
   ERROR_VIDEO_MESSAGE,
 } from '../constants/messages';
@@ -36,9 +35,8 @@ export const handleVideo = async (
     const duration = videoMessage.seconds ?? 0;
     if (duration > VIDEO_STICKER_CONFIG.maxDuration) {
       await sock.sendMessage(sender, {
-        text: ERROR_MAX_DURATION_VIDEO_MESSAGE,
+        text: `✂️ Vídeo com ${Math.round(duration)}s — vou usar os primeiros ${VIDEO_STICKER_CONFIG.maxDuration}s!`,
       });
-      return;
     }
 
     await sock.sendMessage(sender, {

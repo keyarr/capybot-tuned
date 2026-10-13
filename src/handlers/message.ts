@@ -12,13 +12,30 @@ import {
   markUserAsNotified,
   checkMaintenanceModeChange,
 } from '../services/maintenance';
-import { MAINTENANCE_MODE } from '../constants/config';
+import {
+  MAINTENANCE_MODE,
+  ALLOWED_NUMBERS,
+  isNumberAllowed,
+} from '../constants/config';
 
 export const handleMessage = async (
   sock: WASocket,
   msg: WAMessage
 ): Promise<void> => {
   const sender = msg.key.remoteJid as string;
+
+  // Allowlist filter: ignore senders not on the list (when list is set).
+  // Prefer senderPn (real phone JID) since WhatsApp may address chats by LID.
+  // Empty allowlist = respond to everyone.
+  if (ALLOWED_NUMBERS.length > 0) {
+    const identity = msg.key.senderPn ?? sender;
+    if (!isNumberAllowed(identity.replace(/\D/g, ''))) {
+      console.log(
+        `⛔ Ignored message from non-allowlisted sender: ${sender} (pn: ${msg.key.senderPn ?? 'unknown'})`
+      );
+      return;
+    }
+  }
 
   try {
     const isMaintenanceMode = MAINTENANCE_MODE;
