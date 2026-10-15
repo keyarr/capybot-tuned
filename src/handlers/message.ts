@@ -17,6 +17,7 @@ import {
   ALLOWED_NUMBERS,
   isNumberAllowed,
 } from '../constants/config';
+import { safeSendMessage } from '../utils/safe-send';
 
 export const handleMessage = async (
   sock: WASocket,
@@ -79,7 +80,8 @@ export const handleMessage = async (
     }
   } catch (error) {
     console.error('❌ Error processing message:', error);
-    await sock.sendMessage(sender, {
+    // Best-effort: último nível de defesa, nunca pode lançar
+    await safeSendMessage(sock, sender, {
       text: ERROR_MESSAGE,
     });
   }

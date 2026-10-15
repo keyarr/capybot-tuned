@@ -10,6 +10,7 @@ import {
   isSupportedForSticker,
   cleanTempFiles,
 } from '../services/media';
+import { safeSendMessage } from '../utils/safe-send';
 
 export const handleImage = async (
   sock: WASocket,
@@ -56,7 +57,8 @@ export const handleImage = async (
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
   } catch (error: any) {
     console.error('❌ Error processing image:', error);
-    await sock.sendMessage(sender, {
+    // Best-effort: não relança se o socket estiver fechado
+    await safeSendMessage(sock, sender, {
       text: ERROR_MESSAGE,
     });
   }

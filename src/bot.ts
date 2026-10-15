@@ -10,6 +10,16 @@ import qrcode from 'qrcode-terminal';
 import { handleMessage } from './handlers/message';
 import { MAINTENANCE_MODE } from './constants/config';
 
+// Última linha de defesa: loga em vez de derrubar o processo.
+// O systemd continua como backup se algo realmente fatal ocorrer.
+process.on('unhandledRejection', reason => {
+  console.error('⚠️ unhandledRejection (ignorado, processo mantido):', reason);
+});
+
+process.on('uncaughtException', err => {
+  console.error('⚠️ uncaughtException (ignorado, processo mantido):', err);
+});
+
 async function startBot() {
   console.log(
     `   Maintenance Mode: ${MAINTENANCE_MODE ? '🟡 ENABLED' : '🟢 DISABLED'}`
@@ -47,15 +57,23 @@ async function startBot() {
       const shouldReconnect =
         (lastDisconnect?.error as any)?.output?.statusCode !==
         DisconnectReason.loggedOut;
-      if (shouldReconnect) startBot();
       console.log('❌ Connection closed:', lastDisconnect);
+      if (shouldReconnect) {
+        // Delay curto evita loop apertado em rede instável (EAI_AGAIN/503/515)
+        setTimeout(() => void startBot(), 2000);
+      }
     }
   });
 
   sock.ev.on('messages.upsert', async ({ messages }) => {
     const msg = messages[0];
     if (msg && !msg.key.fromMe) {
-      await handleMessage(sock, msg);
+      try {
+        await handleMessage(sock, msg);
+      } catch (error) {
+        // Nunca deixa exceção de handler matar o loop do Baileys
+        console.error('⚠️ messages.upsert handler falhou (ignorado):', error);
+      }
     }
   });
 }

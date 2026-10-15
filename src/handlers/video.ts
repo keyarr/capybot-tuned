@@ -7,11 +7,11 @@ import {
 } from '../services/video';
 import fs from 'fs';
 import path from 'path';
-import {
-  ERROR_UNSUPPORTED_VIDEO_MESSAGE,
+import { ERROR_UNSUPPORTED_VIDEO_MESSAGE,
   PROCESSING_VIDEO_MESSAGE,
   ERROR_VIDEO_MESSAGE,
 } from '../constants/messages';
+import { safeSendMessage } from '../utils/safe-send';
 import { VIDEO_STICKER_CONFIG } from '../constants/config';
 
 export const handleVideo = async (
@@ -68,12 +68,18 @@ export const handleVideo = async (
       if (stickerBuffer.square) {
         await sock.sendMessage(sender, {
           sticker: stickerBuffer.square,
+          isAnimated: true,
+          width: 512,
+          height: 512,
         });
       }
 
       if (stickerBuffer.original) {
         await sock.sendMessage(sender, {
           sticker: stickerBuffer.original,
+          isAnimated: true,
+          width: 512,
+          height: 512,
         });
       }
 
@@ -88,7 +94,8 @@ export const handleVideo = async (
   } catch (error: any) {
     console.error('❌ An error occurred while processing the video :', error);
 
-    await sock.sendMessage(sender, {
+    // Best-effort: nunca derruba o processo se o socket caiu no meio do envio
+    await safeSendMessage(sock, sender, {
       text: ERROR_VIDEO_MESSAGE,
     });
   }
